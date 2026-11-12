@@ -1,5 +1,6 @@
 //! The sources and the entry point for a lookup.
 
+mod bne;
 mod bnf;
 mod crossref;
 mod dnb;
@@ -188,6 +189,7 @@ async fn fetch(source: Source, client: &Client, isbn: &Isbn, options: &FetchOpti
         Source::Loc => loc::fetch(client, isbn, options).await.map(books),
         Source::OpenLibrary => open_library::fetch(client, isbn, options).await.map(books),
         Source::Bnf => bnf::fetch(client, isbn, options).await.map(books),
+        Source::Bne => bne::fetch(client, isbn, options).await.map(books),
         Source::Crossref => crossref::fetch(client, isbn, options).await.map(books),
         Source::Goodreads => goodreads::fetch(client, isbn, options).await.map(books),
         Source::Wikidata => {

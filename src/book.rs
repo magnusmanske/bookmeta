@@ -10,6 +10,7 @@ pub enum Source {
     Loc,
     OpenLibrary,
     Bnf,
+    Bne,
     Crossref,
     Goodreads,
     Wikidata,
@@ -19,13 +20,14 @@ pub enum Source {
 
 impl Source {
     /// The sources that can be queried. [`Source::Merged`] is not one.
-    pub const FETCHABLE: [Source; 9] = [
+    pub const FETCHABLE: [Source; 10] = [
         Source::GoogleBooks,
         Source::Dnb,
         Source::K10plus,
         Source::Loc,
         Source::OpenLibrary,
         Source::Bnf,
+        Source::Bne,
         Source::Crossref,
         Source::Goodreads,
         Source::Wikidata,
@@ -40,6 +42,7 @@ impl Source {
             Source::Loc => "Library of Congress",
             Source::OpenLibrary => "Open Library",
             Source::Bnf => "BnF",
+            Source::Bne => "BNE",
             Source::Crossref => "Crossref",
             Source::Goodreads => "Goodreads",
             Source::Wikidata => "Wikidata",
@@ -56,6 +59,7 @@ impl Source {
             Source::Loc => "loc",
             Source::OpenLibrary => "openlibrary",
             Source::Bnf => "bnf",
+            Source::Bne => "bne",
             Source::Crossref => "crossref",
             Source::Goodreads => "goodreads",
             Source::Wikidata => "wikidata",
@@ -70,6 +74,7 @@ impl Source {
             Source::Dnb => 90,
             Source::K10plus => 80,
             Source::Bnf => 70,
+            Source::Bne => 68,
             Source::Loc => 60,
             Source::OpenLibrary => 50,
             Source::GoogleBooks => 40,
@@ -92,6 +97,7 @@ pub struct BookIds {
     pub loc: Option<String>,
     pub k10plus: Option<String>,
     pub bnf: Option<String>,
+    pub bne: Option<String>,
     pub crossref_doi: Option<String>,
     /// The numeric Goodreads book ID.
     pub goodreads: Option<String>,
@@ -105,7 +111,7 @@ impl BookIds {
                 $(if self.$field.is_none() { self.$field = other.$field.clone(); })+
             };
         }
-        fill!(isbn10, isbn13, google_books, open_library, dnb, loc, k10plus, bnf, crossref_doi, goodreads, oclc);
+        fill!(isbn10, isbn13, google_books, open_library, dnb, loc, k10plus, bnf, bne, crossref_doi, goodreads, oclc);
     }
 }
 

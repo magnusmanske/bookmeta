@@ -1,4 +1,4 @@
-//! MARCXML records, as DNB and K10plus return them.
+//! MARCXML records, as DNB, K10plus and BNE return them.
 
 use crate::util::{clean, language_code, natural_name, pages_from, year_from};
 use crate::{Book, BookError, Source};
@@ -26,6 +26,16 @@ pub(crate) fn parse(xml: &str, source: Source, isbn: &crate::Isbn) -> Result<Vec
         .and_then(|node| node.text())
         .map(clean)
         .filter(|id| !id.is_empty());
+    // The fixed field records the language of the item; many BNE records have
+    // no 041 field.
+    let fixed_language = record
+        .children()
+        .find(|node| {
+            node.is_element() && node.tag_name().name() == "controlfield" && node.attribute("tag") == Some("008")
+        })
+        .and_then(|node| node.text())
+        .and_then(|text| text.get(35..38))
+        .and_then(language_code);
 
     for field in record.children().filter(|node| node.is_element() && node.tag_name().name() == "datafield") {
         match field.attribute("tag").unwrap_or_default() {
@@ -83,13 +93,18 @@ pub(crate) fn parse(xml: &str, source: Source, isbn: &crate::Isbn) -> Result<Vec
         }
     }
 
+    if book.language.is_none() {
+        book.language = fixed_language;
+    }
+
     // The record was found by this ISBN; it may list other editions too.
     book.ids.isbn13 = Some(isbn.isbn13_hyphenated());
     book.ids.isbn10 = isbn.isbn10_hyphenated();
-    if source == Source::Dnb {
-        book.ids.dnb = control_id;
-    } else if source == Source::K10plus {
-        book.ids.k10plus = control_id;
+    match source {
+        Source::Dnb => book.ids.dnb = control_id,
+        Source::K10plus => book.ids.k10plus = control_id,
+        Source::Bne => book.ids.bne = control_id,
+        _ => {}
     }
     Ok(book.finish().into_iter().collect())
 }
