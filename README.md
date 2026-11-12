@@ -16,6 +16,7 @@ Wikidata statement, or anything else.
 | BnF | SRU, Dublin Core | title, authors, publisher, place, year, pages, language, BnF ID |
 | BNE | Alma SRU, MARCXML | title, authors, publisher, place, year, pages, language, BNE ID |
 | KB | SRU, Dublin Core | title, authors, publisher, place, year, pages, language, PPN |
+| NDL | SRU, DCNDL | title, authors, publisher, year, pages, language, NDL ID |
 | Crossref | REST API, `type:book` | title, publisher, place, year, DOI, language |
 | Goodreads | `book/isbn/<isbn13>`, embedded `__NEXT_DATA__` JSON | title, authors, publisher, year, pages, language, Goodreads ID |
 | Wikidata | SPARQL, `P212`/`P957` | existing items for the ISBN |

@@ -10,6 +10,7 @@ mod kb;
 mod k10plus;
 mod loc;
 mod marc;
+mod ndl;
 mod open_library;
 mod wikidata;
 
@@ -192,6 +193,7 @@ async fn fetch(source: Source, client: &Client, isbn: &Isbn, options: &FetchOpti
         Source::Bnf => bnf::fetch(client, isbn, options).await.map(books),
         Source::Bne => bne::fetch(client, isbn, options).await.map(books),
         Source::Kb => kb::fetch(client, isbn, options).await.map(books),
+        Source::Ndl => ndl::fetch(client, isbn, options).await.map(books),
         Source::Crossref => crossref::fetch(client, isbn, options).await.map(books),
         Source::Goodreads => goodreads::fetch(client, isbn, options).await.map(books),
         Source::Wikidata => {
