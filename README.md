@@ -15,6 +15,7 @@ Wikidata statement, or anything else.
 | Open Library | `jscmd=data`, edition JSON fallback | title, authors, publisher, place, year, pages, Open Library ID |
 | BnF | SRU, Dublin Core | title, authors, publisher, place, year, pages, language, BnF ID |
 | Crossref | REST API, `type:book` | title, publisher, place, year, DOI, language |
+| Goodreads | `book/isbn/<isbn13>`, embedded `__NEXT_DATA__` JSON | title, authors, publisher, year, pages, language, Goodreads ID |
 | Wikidata | SPARQL, `P212`/`P957` | existing items for the ISBN |
 
 All sources are queried concurrently. One failing source does not discard the
@@ -43,6 +44,17 @@ if let Some(merged) = lookup.merged() {
 `Isbn` validates the check digit and converts between ISBN-10 and ISBN-13. The
 sources use the digits-only ISBN-13; the display form keeps what the user
 typed (without `ISBN` or other text).
+
+### Goodreads
+
+Goodreads retired its public API in 2020, so the source reads the book page
+that `https://www.goodreads.com/book/isbn/<isbn13>` redirects to. The page is
+a Next.js app that embeds the catalogue record as JSON in a `__NEXT_DATA__`
+script tag; that JSON is read directly, without an HTML parser. Scraping is
+inherently more brittle than an API, and the ISBN-10 form of the route answers
+`404` for books the ISBN-13 form finds, so only the ISBN-13 is queried. Enable
+it like any other source; drop it with `.without(bookmeta::Source::Goodreads)`
+if the page layout changes.
 
 ### Google Books API key
 

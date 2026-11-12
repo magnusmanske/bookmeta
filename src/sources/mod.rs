@@ -3,6 +3,7 @@
 mod bnf;
 mod crossref;
 mod dnb;
+mod goodreads;
 mod google_books;
 mod k10plus;
 mod loc;
@@ -188,6 +189,7 @@ async fn fetch(source: Source, client: &Client, isbn: &Isbn, options: &FetchOpti
         Source::OpenLibrary => open_library::fetch(client, isbn, options).await.map(books),
         Source::Bnf => bnf::fetch(client, isbn, options).await.map(books),
         Source::Crossref => crossref::fetch(client, isbn, options).await.map(books),
+        Source::Goodreads => goodreads::fetch(client, isbn, options).await.map(books),
         Source::Wikidata => {
             wikidata::fetch(client, isbn, options).await.map(|wikidata| Fetched { books: vec![], wikidata })
         }
