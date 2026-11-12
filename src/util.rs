@@ -50,6 +50,21 @@ pub(crate) fn pages_from(text: &str) -> Option<u32> {
     first
 }
 
+/// A page count from an extent such as `394p ; 15cm` or `80 pagina's`, but not
+/// from a bare measurement such as `21 cm`.
+pub(crate) fn pages_from_extent(text: &str) -> Option<u32> {
+    let part = text.split(';').next().unwrap_or(text);
+    let lower = part.to_lowercase();
+    let marked = lower.char_indices().any(|(index, character)| {
+        if !character.is_ascii_digit() {
+            return false;
+        }
+        let rest = lower.get(index + 1..).unwrap_or_default().trim_start();
+        rest.starts_with('p') || rest.starts_with('s') || rest.starts_with("blz")
+    });
+    if marked { pages_from(part) } else { None }
+}
+
 /// `Kater, Michael H. [Verfasser]` or `Saint-Exupéry, Antoine de (1900-1944). Auteur du texte`
 /// as `Michael H. Kater` / `Antoine de Saint-Exupéry`.
 pub(crate) fn natural_name(name: &str) -> String {
@@ -187,6 +202,16 @@ mod tests {
         assert_eq!(pages_from("452 pages"), Some(452));
         assert_eq!(pages_from("1 vol. (113 p.) : ill."), Some(113));
         assert_eq!(pages_from("no pages"), None);
+    }
+
+    #[test]
+    fn extents() {
+        assert_eq!(pages_from_extent("394p ; 15cm"), Some(394));
+        assert_eq!(pages_from_extent("80 pagina's"), Some(80));
+        assert_eq!(pages_from_extent("236 p"), Some(236));
+        assert_eq!(pages_from_extent("21 cm"), None);
+        assert_eq!(pages_from_extent("16cm"), None);
+        assert_eq!(pages_from_extent("11 dl. in 13 bd"), None);
     }
 
     #[test]
