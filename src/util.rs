@@ -222,4 +222,9 @@ mod tests {
         assert_eq!(language_code("en").as_deref(), Some("en"));
         assert_eq!(language_code("xxx"), None);
     }
+
+    #[test]
+    fn normalizes_combining_marks() {
+        assert_eq!(clean("Mu\u{308}nchen"), "München");
+    }
 }

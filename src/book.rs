@@ -212,3 +212,16 @@ pub struct SourceFailure {
     pub source: Source,
     pub message: String,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn zero_pages_are_ignored() {
+        let mut book = Book::new(Source::Dnb);
+        book.title = "A title".to_string();
+        book.pages = Some(0);
+        assert_eq!(book.finish().map(|book| book.pages), Some(None));
+    }
+}

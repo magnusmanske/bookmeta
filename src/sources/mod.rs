@@ -236,3 +236,43 @@ pub(crate) async fn get_json<T: DeserializeOwned>(
     let text = get_text(client, url, query, timeout).await?;
     Ok(serde_json::from_str(&text)?)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn book(source: Source, title: &str, publisher: &str) -> Book {
+        let mut book = Book::new(source);
+        book.title = title.to_string();
+        book.publisher = publisher.to_string();
+        book
+    }
+
+    fn lookup(books: Vec<Book>) -> Lookup {
+        Lookup {
+            isbn: Isbn::parse("9783423306669").unwrap(),
+            books,
+            wikidata: vec![],
+            failures: vec![],
+        }
+    }
+
+    #[test]
+    fn merged_uses_one_record_per_source() {
+        let lookup = lookup(vec![
+            book(Source::Dnb, "Short", ""),
+            book(Source::Dnb, "Long title", "Publisher"),
+            book(Source::K10plus, "Other title", ""),
+        ]);
+        let merged = lookup.merged().unwrap();
+        assert_eq!(merged.source, Source::Merged);
+        assert_eq!(merged.title, "Long title");
+        assert_eq!(merged.publisher, "Publisher");
+    }
+
+    #[test]
+    fn one_source_alone_is_not_merged() {
+        let lookup = lookup(vec![book(Source::Dnb, "One", ""), book(Source::Dnb, "Two", "")]);
+        assert!(lookup.merged().is_none());
+    }
+}
