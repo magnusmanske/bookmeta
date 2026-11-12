@@ -33,8 +33,10 @@ pub(crate) async fn fetch(
         if !seen.insert(item.to_string()) {
             continue;
         }
-        let label =
-            binding.get("itemLabel").map(|value| value.value.trim().to_string()).filter(|label| !label.is_empty());
+        let label = binding
+            .get("itemLabel")
+            .map(|value| value.value.trim().to_string())
+            .filter(|label| !label.is_empty() && label != item);
         items.push(WikidataItem { id: item.to_string(), label });
     }
     Ok(items)
